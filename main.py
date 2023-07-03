@@ -25,7 +25,7 @@ def start_bot_command(message):
 @bot.message_handler(commands=['help'])
 def help_bot_command(message):
     response = help_bot()
-    bot.reply_to(message, response)
+    bot.reply_to(message, response, parse_mode="markdown")
 
 
 @bot.message_handler(commands=['ban'])
@@ -36,7 +36,7 @@ def ban_bot_command(message):
 
 @bot.message_handler(commands=['unban'])
 def unban_bot_command(message):
-    response = unban_bot(message.text, message.from_user.username)
+    response = unban_bot(message.text)
     bot.reply_to(message, response, parse_mode="markdown")
 
 
