@@ -20,8 +20,8 @@ from config import settings
 
 def help_bot() -> str:
     ip = "`/ip`\n—`/ip` - заблокированные IP за сегодня\n—`/ip X.X.X.X` - проверка IP адреса\n—`/ip date` - заблокированные IP за date\n—`/ip date_1-date_2` - заблокированные IP за промежуток date\\_1-date\\_2\n—`/file` - экспорт в файл; добавляется в конце запроса\n\n"
-    ban = "`/ban`\n—`/ban X.X.X.X` - блокировка IP\n—`/ban X.X.X.X ban_reason` - блокировка IP с указанием причины\n—`/ban X.X.X.X /source` - блокировка IP с указанием источника\n\n"
-    unban = "`/unban`\n—`/unban X.X.X.X` - разблокировка IP\n\n"
+    ban = "`/ban`\n—`/ban X.X.X.X` - блокировка IP\n—`/ban X.X.X.X ban_reason` - блокировка IP с указанием причины\n—`/ban X.X.X.X /source` - блокировка IP с указанием источника\n`/ban X.X.X.X x_reason /x_source`\n`Y.Y.Y.Y y_reason /y_source` - блокировка нескольких IP\n\n"
+    unban = "`/unban`\n—`/unban X.X.X.X` - разблокировка IP\n`/unban X.X.X.X`\n`Y.Y.Y.Y` - разблокировка нескольких IP\n\n"
     alert = "`/alert`\n—`/alert` - алерты за сегодня\n—`/alert date` - алерты за date\n—`/alert date_1-date_2` - алерты за промежуток date\\_1-date\\_2\n—`/file` - экспорт в файл; добавляется в конце запроса\n\n"
     add_alert = "`/addalert`\n`/addalert alert_body` - добавление алерта\n`/addalert alert_body /alert_source` - добавление алерта с указанием источника\n\n"
     contact = "*for any issues contact @deen3s*"

@@ -28,7 +28,7 @@ Can be run on any system as long as it is compatible with the libraries describe
    ```
 3. Install Python packages
    ```sh
-   pip -r requirements.txt
+   pip install -r requirements.txt
    ```
 4. Enter your Telegram Bot API in `.env`
    ```sh
@@ -52,4 +52,4 @@ Can be run on any system as long as it is compatible with the libraries describe
 
 ## License
 
-This project is licensed under the GNUv3 License - see the LICENSE.md file for details
+This project is licensed under the GPL-3.0 License - see the LICENSE.md file for details
