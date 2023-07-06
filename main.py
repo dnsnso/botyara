@@ -14,53 +14,88 @@ bot = telebot.TeleBot(settings.TELEGRAM_TOKEN)
 
 @bot.message_handler(func = lambda message: message.chat.id not in get_legal_users())
 def unknown_bot_user(message):
-   bot.send_message(message.chat.id, "are u czi guy?..")
-   
+    try:
+        bot.send_message(message.chat.id, "are u czi guy?..")
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
+
 
 @bot.message_handler(commands=['start'])
 def start_bot_command(message):
-    bot.send_photo(message.chat.id, photo=open(r'images/start-hello.jpg', 'rb'))
-
+    try:
+        bot.send_photo(message.chat.id, photo=open(r'images/start-hello.jpg', 'rb'))
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
+    
 
 @bot.message_handler(commands=['help'])
 def help_bot_command(message):
-    response = help_bot()
-    bot.reply_to(message, response, parse_mode="markdown")
+    try:
+        response = help_bot()
+        bot.reply_to(message, response, parse_mode="markdown")
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
 
 
 @bot.message_handler(commands=['ban'])
 def ban_bot_command(message):
-    response = ban_bot(message.text, message.from_user.username)
-    bot.reply_to(message, response, parse_mode="markdown")
+    try:
+        response = ban_bot(message.text, message.from_user.username)
+        bot.reply_to(message, response, parse_mode="markdown")
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
 
 
 @bot.message_handler(commands=['unban'])
 def unban_bot_command(message):
-    response = unban_bot(message.text)
-    bot.reply_to(message, response, parse_mode="markdown")
-
+    try:
+        response = unban_bot(message.text)
+        bot.reply_to(message, response, parse_mode="markdown")
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
 
 @bot.message_handler(commands=['ip'])
 def ip_bot_command(message):
-    response = ip_bot(message.text)
-    bot.reply_to(message, response, parse_mode="markdown")
+    try:
+        response = ip_bot(message.text)
+        bot.reply_to(message, response, parse_mode="markdown")
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
 
 
 @bot.message_handler(commands=['alert'])
 def alert_bot_command(message):
-    response = alert_bot(message.text)
-    bot.reply_to(message, response, parse_mode="markdown")
+    try:
+        response = alert_bot(message.text)
+        bot.reply_to(message, response, parse_mode="markdown")
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
 
 
 @bot.message_handler(commands=['addalert'])
 def add_alert_bot_command(message):
-    response = add_alert_bot(message.text, message.from_user.username)
-    bot.reply_to(message, response, parse_mode="markdown")
+    try:
+        response = add_alert_bot(message.text, message.from_user.username)
+        bot.reply_to(message, response, parse_mode="markdown")
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
 
 
 @bot.message_handler()
 def get_ip_by_date(message):
-    bot.send_sticker(message.chat.id, stickers.STICKER_EPIC_SAD)
+    try:
+        bot.send_sticker(message.chat.id, stickers.STICKER_EPIC_SAD)
+    except Exception as e:
+        bot.send_message(message.chat.id, "do not try to abuse me :'(")
+        print(e)
 
 
 bot.infinity_polling()

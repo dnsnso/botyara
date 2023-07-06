@@ -10,6 +10,7 @@ class Settings:
     TELEGRAM_TOKEN: str = os.getenv("TELEGRAM_API_KEY")
     GEOIP_TOKEN: str = os.getenv("GEOIP_TOKEN")
     FILE_PATH: str = os.getenv("FILE_PATH")
+    CONTACT_NICKNAME: str = os.getenv("CONTACT_NICKNAME")
     POSTGRES_USER: str = os.getenv("POSTGRES_USER")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER")
@@ -63,6 +64,7 @@ class Subnets:
     LOCAL_SUBNET_2: str = os.getenv("LOCAL_SUBNET_2")
     LOCAL_SUBNET_3: str = os.getenv("LOCAL_SUBNET_3")
     LOCALHOST: str = os.getenv("LOCALHOST")
+
 
 stickers = Stickers()
 

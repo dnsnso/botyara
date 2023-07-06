@@ -11,11 +11,20 @@ def make_shield(input_string: str) -> str:
     return output_string
 
 
-def parse_ip(input_string: str) -> str:
+def parse_single_ip(input_string: str) -> str:
     try:
         return re.findall(ip_address_re, input_string)[0]
     except Exception as e:
+        print(e)
+        return "invalid input data"
+
+
+def parse_multiple_ip(input_string: str) -> str:
+    try:
         return re.findall(ip_address_re, input_string)
+    except Exception as e:
+        print(e)
+        return "invalid input data"
 
 
 def remove_nickname(input_string: str) -> str:

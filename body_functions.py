@@ -2,7 +2,7 @@ from datetime import datetime
 import pandas as pd
 import flag
 
-from secondary_functions import remove_nickname, remove_command, parse_ip, make_shield, make_pretty_alerts
+from secondary_functions import remove_nickname, remove_command, parse_single_ip, parse_multiple_ip, make_shield, make_pretty_alerts
 
 from db_operations import get_ip, add_ip, remove_ip, get_ip_today, get_ip_by_date, get_ip_by_period
 from db_operations import add_alert, get_alerts_by_date, get_alerts_by_period
@@ -19,12 +19,12 @@ from config import settings
 
 
 def help_bot() -> str:
-    ip = "`/ip`\n—`/ip` - заблокированные IP за сегодня\n—`/ip X.X.X.X` - проверка IP адреса\n—`/ip date` - заблокированные IP за date\n—`/ip date_1-date_2` - заблокированные IP за промежуток date\\_1-date\\_2\n—`/file` - экспорт в файл; добавляется в конце запроса\n\n"
-    ban = "`/ban`\n—`/ban X.X.X.X` - блокировка IP\n—`/ban X.X.X.X ban_reason` - блокировка IP с указанием причины\n—`/ban X.X.X.X /source` - блокировка IP с указанием источника\n`/ban X.X.X.X x_reason /x_source`\n`Y.Y.Y.Y y_reason /y_source` - блокировка нескольких IP\n\n"
-    unban = "`/unban`\n—`/unban X.X.X.X` - разблокировка IP\n`/unban X.X.X.X`\n`Y.Y.Y.Y` - разблокировка нескольких IP\n\n"
+    ip = "`/ip`\n—`/ip` - заблокированные IP за сегодня\n—`/ip X.X.X.X` - проверка IP адреса\n—`/ip X.X.X.X Y.Y.Y.Y` - проверка нескольких IP адресов\n—`/ip date` - заблокированные IP за date\n—`/ip date_1-date_2` - заблокированные IP за промежуток date\\_1-date\\_2\n—`/file` - экспорт в файл; добавляется в конце запроса\n\n"
+    ban = "`/ban`\n—`/ban X.X.X.X` - блокировка IP\n—`/ban X.X.X.X ban_reason` - блокировка IP с указанием причины\n—`/ban X.X.X.X /source` - блокировка IP с указанием источника\n—`/ban X.X.X.X x_reason /x_source`\n`Y.Y.Y.Y y_reason /y_source` - блокировка нескольких IP\n—`/ban X.X.X.X Y.Y.Y.Y ban_reason /source /same` - блокировка нескольких IP с одной причиной и источником\n\n"
+    unban = "`/unban`\n—`/unban X.X.X.X` - разблокировка IP\n—`/unban X.X.X.X Y.Y.Y.Y` - разблокировка нескольких IP\n\n"
     alert = "`/alert`\n—`/alert` - алерты за сегодня\n—`/alert date` - алерты за date\n—`/alert date_1-date_2` - алерты за промежуток date\\_1-date\\_2\n—`/file` - экспорт в файл; добавляется в конце запроса\n\n"
-    add_alert = "`/addalert`\n`/addalert alert_body` - добавление алерта\n`/addalert alert_body /alert_source` - добавление алерта с указанием источника\n\n"
-    contact = "*for any issues contact @deen3s*"
+    add_alert = "`/addalert`\n—`/addalert alert_body` - добавление алерта\n—`/addalert alert_body /alert_source` - добавление алерта с указанием источника\n\n"
+    contact = f"*for any issues contact @{settings.CONTACT_NICKNAME}*"
     response = ip + ban + unban + alert + add_alert + contact
     return response
 
@@ -33,53 +33,90 @@ def ban_bot(input_text: str, ban_author: str) -> str:
     total_response = ""
     input_text = remove_nickname(input_text)
     without_command = remove_command(input_text)
-    splitted_text = without_command.split("\n")
-    for record in splitted_text:
-        bot_response = ""
-        ip_address = parse_ip(record)
-        try:
-            if is_valid(ip_address):
-                if is_local(ip_address):
-                    bot_response = f"{ip_address} - is actually local🤷‍♂️"
-                    # bot.send_sticker(message.chat.id, stickers.STICKER_GENIALNO)
-                else:
-                    if is_our(ip_address):
-                        # local_stickers = [stickers.STICKER_DURKA, stickers.STICKER_PUTIN, stickers.STICKER_KIT_NAH, stickers.STICKER_PESIK, stickers.STICKER_CHEL, stickers.STICKER_NAH]
-                        # bot.send_sticker(message.chat.id, choice(local_stickers))
-                        bot_response = f"{ip_address} - is actually our public🤷‍♂️"
+    same_reason_indicator = "/same"
+    if same_reason_indicator in without_command:
+        ip_addresses = parse_multiple_ip(without_command)
+        # reason_source = ''.join(parse_ip_re.split(without_command)).replace(f"{same_reason_indicator}", "").strip()
+        without_command = without_command.replace(f"{same_reason_indicator}", "")
+        for record in ip_addresses:
+            bot_response = ""
+            ip_address = parse_single_ip(record)
+            try:
+                if is_valid(ip_address):
+                    if is_local(ip_address):
+                        bot_response = f"{ip_address} - is actually local🤷‍♂️"
                     else:
-                        reason_source = ''.join(parse_ip_re.split(without_command))
-                        reason, source = "", ""
-                        if reason_source:
-                            if "/" in reason_source:
-                                reason_source = reason_source.split("/")
-                                reason = reason_source[0]
-                                source = reason_source[1]
-                            else:
-                                reason = reason_source
-                        if reason:
-                            reason = reason.strip()
-                        if source:
-                            source = source.strip()
-                        ok = add_ip(ip_address, reason, source, ban_author)
-                        if ok:
-                            # bot.send_sticker(message.chat.id, stickers.STICKER_LADNO, reply_to_message_id=message.id)
-                            bot_response = f"`{ip_address}` - has been banned"
+                        if is_our(ip_address):
+                            bot_response = f"{ip_address} - is actually our public🤷‍♂️"
                         else:
-                            record = get_ip(ip_address)
-                            ip_address = record[0][1].split("/")[0]
-                            bot_response = f"`{ip_address}` - already banned"
-                            # bot.reply_to(message, response, parse_mode="markdown")
-            else:
-                # bot.reply_to(message, "скормите мне валидный IP, пожалуйста 🥲")
+                            reason_source = ''.join(parse_ip_re.split(without_command))
+                            reason, source = "", ""
+                            if reason_source:
+                                if "/" in reason_source:
+                                    reason_source = reason_source.split("/")
+                                    reason = reason_source[0]
+                                    source = reason_source[1]
+                                else:
+                                    reason = reason_source
+                            if reason:
+                                reason = reason.strip()
+                            if source:
+                                source = source.strip()
+                            ok = add_ip(ip_address, reason, source, ban_author)
+                            if ok:
+                                bot_response = f"`{ip_address}` - has been banned"
+                            else:
+                                record = get_ip(ip_address)
+                                ip_address = record[0][1].split("/")[0]
+                                bot_response = f"`{ip_address}` - already banned"
+                else:
+                    bot_response = f"{record} - invalid input data"
+            except ValueError as e:
                 bot_response = f"{record} - invalid input data"
-        except ValueError as e:
-            bot_response = f"{record} - invalid input data"
-            print(e)
-        finally:
-            total_response += (bot_response + "\n")
+                print(e)
+            finally:
+                total_response += (bot_response + "\n")
+    else:
+        splitted_text = without_command.split("\n")
+        for record in splitted_text:
+            bot_response = ""
+            ip_address = parse_single_ip(record)
+            try:
+                if is_valid(ip_address):
+                    if is_local(ip_address):
+                        bot_response = f"{ip_address} - is actually local🤷‍♂️"
+                    else:
+                        if is_our(ip_address):
+                            bot_response = f"{ip_address} - is actually our public🤷‍♂️"
+                        else:
+                            reason_source = ''.join(parse_ip_re.split(without_command))
+                            reason, source = "", ""
+                            if reason_source:
+                                if "/" in reason_source:
+                                    reason_source = reason_source.split("/")
+                                    reason = reason_source[0]
+                                    source = reason_source[1]
+                                else:
+                                    reason = reason_source
+                            if reason:
+                                reason = reason.strip()
+                            if source:
+                                source = source.strip()
+                            ok = add_ip(ip_address, reason, source, ban_author)
+                            if ok:
+                                bot_response = f"`{ip_address}` - has been banned"
+                            else:
+                                record = get_ip(ip_address)
+                                ip_address = record[0][1].split("/")[0]
+                                bot_response = f"`{ip_address}` - already banned"
+                else:
+                    bot_response = f"{record} - invalid input data"
+            except ValueError as e:
+                bot_response = f"{record} - invalid input data"
+                print(e)
+            finally:
+                total_response += (bot_response + "\n")
     return total_response
-    # bot.send_sticker(message.chat.id, stickers.STICKER_SAD)
 
 
 def add_alert_bot(input_text: str, alert_author: str) -> str:
@@ -146,7 +183,6 @@ def alert_bot(input_text: str) -> str:
                     writer = pd.ExcelWriter(file_name, engine='xlsxwriter')
                     try:
                         output = create_file_alerts_by_period(date_1, date_2)
-                        print(output)
                         data = pd.DataFrame(output)
                         data.to_excel(writer, 'Sheet1')
                         writer.close()
@@ -186,43 +222,58 @@ def ip_bot(input_text: str) -> str:
     input_text = remove_nickname(input_text)
     without_command = remove_command(input_text)
     try:
-        ip_address = parse_ip(input_text)
-        if ip_address:
-            if is_valid(ip_address):
-                record = get_ip(ip_address)
-                if not record:
-                    try:
-                        geoip = get_geo_ip(ip_address)
-                        country_code, country_name = geoip["country_code"], geoip["country_name"]
-                    except Exception as e:
-                        country_code, country_name = "UNDEFINED"
-                    try:
-                        bot_response = f"IP is not banned ✅\ncountry: {flag.flag(country_code)} {country_name}"
-                    except ValueError:
-                        bot_response = "IP is not banned ✅\ncountry: 📺look like a local IP"
+        ip_addresses = parse_multiple_ip(input_text)
+        if ip_addresses:
+            if len(ip_addresses) == 1:
+                ip_address = ip_addresses[0]
+                if is_valid(ip_address):
+                    record = get_ip(ip_address)
+                    if not record:
+                        try:
+                            geoip = get_geo_ip(ip_address)
+                            country_code, country_name = geoip["country_code"], geoip["country_name"]
+                        except Exception as e:
+                            country_code, country_name = "UNDEFINED"
+                        try:
+                            bot_response = f"IP is not banned ✅\ncountry: {flag.flag(country_code)} {country_name}"
+                        except ValueError:
+                            bot_response = "IP is not banned ✅\ncountry: 📺look like a local IP"
+                    else:
+                        ip_address = record[0][1].split("/")[0]
+                        ban_reason = record[0][2]
+                        source = record[0][3]
+                        ban_author = record[0][4]
+                        ban_date = datetime.date(record[0][5]).strftime("%d.%m.%Y")
+                        response = f"banned ❌\nip: `{ip_address}`\n"
+                        try:
+                            geoip = get_geo_ip(ip_address)
+                            country_code, country_name = geoip["country_code"], geoip["country_name"]
+                            response += f"country: {flag.flag(country_code)} {country_name}\n"
+                        except Exception as e:
+                            print(e)
+                            response += f"country: look like a local IP 📺\n"
+                        finally:
+                            if ban_reason != "":
+                                response += f"ban_reason: {ban_reason}\n"
+                            if source != "":
+                                response += f"source: {source}\n"
+                            response += f"ban_date: {ban_date}\nban_author: @{ban_author}"
+                            bot_response = make_shield(response)
                 else:
-                    ip_address = record[0][1].split("/")[0]
-                    ban_reason = record[0][2]
-                    source = record[0][3]
-                    ban_author = record[0][4]
-                    ban_date = datetime.date(record[0][5]).strftime("%d.%m.%Y")
-                    response = f"banned ❌\nip: `{ip_address}`\n"
-                    try:
-                        geoip = get_geo_ip(ip_address)
-                        country_code, country_name = geoip["country_code"], geoip["country_name"]
-                        response += f"country: {flag.flag(country_code)} {country_name}\n"
-                    except Exception as e:
-                        print(e)
-                        response += f"country: look like a local IP 📺\n"
-                    finally:
-                        if ban_reason != "":
-                            response += f"ban_reason: {ban_reason}\n"
-                        if source != "":
-                            response += f"source: {source}\n"
-                        response += f"ban_date: {ban_date}\nban_author: @{ban_author}"
-                        bot_response = make_shield(response)
+                    bot_response = "invalid input data"
             else:
-                bot_response = "invalid input data"
+                ip_addresses.sort()
+                for ip_address in ip_addresses:
+                    response = f"`{ip_address}` - "
+                    if is_valid(ip_address):
+                        record = get_ip(ip_address)
+                        if not record:
+                            response += "is not banned"
+                        else:
+                            response += "blocked"
+                    else:
+                        response += "invalid input data"
+                    bot_response += (response + "\n")
         else:
             file_indicator = False
             if "/file" in without_command:
@@ -245,7 +296,6 @@ def ip_bot(input_text: str) -> str:
                         bot_response = f"banned IPs for {datetime.now().date().strftime('%d.%m.%Y')}:\n\n" + "\n".join(f"`{str(banned_address)}`" for banned_address in banned_ips)
                     else:
                         bot_response = "there is no data"
-                # bot.send_sticker(message.chat.id, stickers.STICKER_SAD, reply_to_message_id=message.id)
             else:
                 if "-" in without_command:
                     separated = without_command.split("-")
@@ -291,17 +341,19 @@ def ip_bot(input_text: str) -> str:
                         bot_response = "invalid input data"
                         print(e)
     except Exception as e:
-        bot_response = e
+        bot_response = "invalid input data"
+        print(e)
     return bot_response
 
 
 def unban_bot(input_text: str) -> str:
     bot_response = ""
     input_text = remove_nickname(input_text)
-    splitted_text = input_text.split("\n")
+    input_text = remove_command(input_text)
+    splitted_text = input_text.split(" ")
     for record in splitted_text:
         response = ""
-        ip_address = parse_ip(record)
+        ip_address = parse_single_ip(record)
         try:
             if is_valid(ip_address):
                 ok = remove_ip(ip_address)
