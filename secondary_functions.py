@@ -50,9 +50,9 @@ def make_pretty_alerts(input_alerts: list) -> str:
             source_response = ""
             if alert[1] != "":
                 source_response = f"source: {alert[1]}\n"
-            pretty_alerts += f"{counter}.\n`{body}`\nalert_date: {alert[3]}\n{source_response}alert_author: {author}\n\n"
+            pretty_alerts += f"{counter}.\n`{body}`\n"
+            pretty_alerts+= make_shield(f"alert_date: {alert[3]}\n{source_response}alert_author: {author}\n\n")
             counter += 1
-        pretty_alerts = make_shield(pretty_alerts)
     else:
         pretty_alerts = "there is no data"
     return pretty_alerts

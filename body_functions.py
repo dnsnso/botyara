@@ -36,7 +36,6 @@ def ban_bot(input_text: str, ban_author: str) -> str:
     same_reason_indicator = "/same"
     if same_reason_indicator in without_command:
         ip_addresses = parse_multiple_ip(without_command)
-        # reason_source = ''.join(parse_ip_re.split(without_command)).replace(f"{same_reason_indicator}", "").strip()
         without_command = without_command.replace(f"{same_reason_indicator}", "")
         for record in ip_addresses:
             bot_response = ""
