@@ -5,7 +5,7 @@ from typing import Union
 from config import settings
 
 
-conn = psycopg2.connect(dbname=settings.POSTGRES_DB, user=settings.POSTGRES_USER, password=settings.POSTGRES_PASSWORD, host=settings.POSTGRES_SERVER)
+conn = psycopg2.connect(dbname=settings.POSTGRES_DB, user=settings.POSTGRES_USER, password=settings.POSTGRES_PASSWORD, host=settings.POSTGRES_SERVER, port=settings.POSTGRES_PORT)
 cursor = conn.cursor()
 
 
