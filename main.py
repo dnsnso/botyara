@@ -12,7 +12,10 @@ from db_operations import get_legal_users
 bot = telebot.TeleBot(settings.TELEGRAM_TOKEN)
 
 
-@bot.message_handler(func = lambda message: message.chat.id not in get_legal_users())
+legal_users = get_legal_users()
+
+
+@bot.message_handler(func = lambda message: message.chat.id not in legal_users)
 def unknown_bot_user(message):
     try:
         bot.send_message(message.chat.id, "are u czi guy?..")
