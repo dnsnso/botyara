@@ -30,7 +30,8 @@ def is_our(ip: str) -> bool:
                                                 ip_address in ipaddress.ip_network(subnets.SUBNET_22) or \
                                                   ip_address in ipaddress.ip_network(subnets.SUBNET_23) or \
                                                     ip_address in ipaddress.ip_network(subnets.SUBNET_24) or \
-                                                      ip_address in ipaddress.ip_network(subnets.SUBNET_25):
+                                                      ip_address in ipaddress.ip_network(subnets.SUBNET_25) or \
+                                                        ip_address in ipaddress.ip_network(subnets.SUBNET_26):
         return True
     return False
 

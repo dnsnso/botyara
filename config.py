@@ -59,6 +59,7 @@ class Subnets:
     SUBNET_23: str = os.getenv("SUBNET_23")
     SUBNET_24: str = os.getenv("SUBNET_24")
     SUBNET_25: str = os.getenv("SUBNET_25")
+    SUBNET_26: str = os.getenv("SUBNET_26")
     VIPNET_SUBNET: str = os.getenv("VIPNET_SUBNET")
     LOCAL_SUBNET_1: str = os.getenv("LOCAL_SUBNET_1")
     LOCAL_SUBNET_2: str = os.getenv("LOCAL_SUBNET_2")

@@ -43,10 +43,10 @@ def ban_bot(input_text: str, ban_author: str) -> str:
             try:
                 if is_valid(ip_address):
                     if is_local(ip_address):
-                        bot_response = f"{ip_address} - is actually local🤷‍♂️"
+                        bot_response = f"{ip_address} - is actually local 🤷‍♂️"
                     else:
                         if is_our(ip_address):
-                            bot_response = f"{ip_address} - is actually our public🤷‍♂️"
+                            bot_response = f"{ip_address} - is actually our public 🤷‍♂️"
                         else:
                             reason_source = ''.join(parse_ip_re.split(without_command))
                             reason, source = "", ""
@@ -83,10 +83,10 @@ def ban_bot(input_text: str, ban_author: str) -> str:
             try:
                 if is_valid(ip_address):
                     if is_local(ip_address):
-                        bot_response = f"{ip_address} - is actually local🤷‍♂️"
+                        bot_response = f"{ip_address} - is actually local 🤷‍♂️"
                     else:
                         if is_our(ip_address):
-                            bot_response = f"{ip_address} - is actually our public🤷‍♂️"
+                            bot_response = f"{ip_address} - is actually our public 🤷‍♂️"
                         else:
                             reason_source = ''.join(parse_ip_re.split(without_command))
                             reason, source = "", ""
@@ -267,9 +267,9 @@ def ip_bot(input_text: str) -> str:
                     if is_valid(ip_address):
                         record = get_ip(ip_address)
                         if not record:
-                            response += "is not banned"
+                            response += "is not banned ✅"
                         else:
-                            response += "blocked"
+                            response += "banned ❌"
                     else:
                         response += "invalid input data"
                     bot_response += (response + "\n")
